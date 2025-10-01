@@ -1,48 +1,45 @@
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import Layout from '../components/Layout';
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
+  const { user, permissions } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">
-                Equity Link Dashboard
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700">
-                {user?.name}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700"
-              >
-                Cerrar sesión
-              </button>
-            </div>
+    <Layout>
+      <div className="bg-white shadow rounded-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          Bienvenido, {user?.name}
+        </h2>
+        
+        <div className="mt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Tus permisos:
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {permissions.length > 0 ? (
+              permissions.map((permission) => (
+                <span
+                  key={permission}
+                  className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                >
+                  {permission}
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-500">Sin permisos asignados</span>
+            )}
           </div>
         </div>
-      </nav>
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-            <p className="text-gray-500 text-lg">
-              Bienvenido, {user?.name}
-            </p>
-          </div>
+
+        <div className="mt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Rol:
+          </h3>
+          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+            {user?.roles?.[0]?.name || 'Sin rol'}
+          </span>
         </div>
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
 }

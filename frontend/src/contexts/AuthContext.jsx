@@ -5,6 +5,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await api.get('/user');
         setUser(response.data.user);
+        setPermissions(response.data.permissions || []);
       } catch (error) {
         localStorage.removeItem('auth_token');
       }
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     const response = await api.post('/login', { email, password });
     localStorage.setItem('auth_token', response.data.token);
     setUser(response.data.user);
+    setPermissions(response.data.permissions || []);
     return response.data;
   };
 
@@ -39,10 +42,29 @@ export const AuthProvider = ({ children }) => {
     }
     localStorage.removeItem('auth_token');
     setUser(null);
+    setPermissions([]);
+  };
+
+  // Función para verificar si el usuario tiene un permiso
+  const hasPermission = (permission) => {
+    return permissions.includes(permission);
+  };
+
+  // Función para verificar si el usuario tiene alguno de los permisos
+  const hasAnyPermission = (permissionArray) => {
+    return permissionArray.some(permission => permissions.includes(permission));
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      permissions,
+      login, 
+      logout, 
+      loading,
+      hasPermission,
+      hasAnyPermission
+    }}>
       {children}
     </AuthContext.Provider>
   );
