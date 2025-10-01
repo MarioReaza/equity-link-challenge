@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
@@ -26,4 +27,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Obtener permisos y roles disponibles
     Route::get('/permissions', [UserController::class, 'permissions']);
     Route::get('/roles', [UserController::class, 'roles']);
+
+    // Rutas de facturas (requiere permiso view-invoices)
+    Route::middleware('permission:view-invoices')->group(function () {
+        Route::get('/invoices', [InvoiceController::class, 'index']);
+    });
+
+    // Subir factura (requiere permiso upload-invoices)
+    Route::middleware('permission:upload-invoices')->group(function () {
+        Route::post('/invoices', [InvoiceController::class, 'store']);
+    });
+
+    // Eliminar factura (requiere ser el propietario)
+    Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy']);
 });
