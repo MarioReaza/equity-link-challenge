@@ -1,3 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Fix para SweetAlert2 con Tailwind */
+.swal2-popup {
+  font-family: inherit !important;
+}
+
+.swal2-title {
+  color: #1f2937 !important;
+}
+
+.swal2-html-container {
+  color: #4b5563 !important;
+}
+
+.swal2-confirm {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.swal2-cancel {
+  background-color: #6b7280 !important;
+  color: white !important;
+}
+
+.swal2-styled:focus {
+  box-shadow: none !important;
+}
