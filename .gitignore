@@ -2,26 +2,31 @@
 node_modules/
 vendor/
 
-# Environment
+# Environment files
 .env
-.env.backup
+.env.*
+!.env.example
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Laravel
-/storage/*.key
-/public/hot
-/public/storage
-/bootstrap/cache
+# Laravel specific
+backend/storage/*.key
+backend/public/hot
+backend/public/storage
+backend/bootstrap/cache/*.php
+backend/.phpunit.result.cache
 
-# Build
-/public/build
-/public/mix-manifest.json
+# Build artifacts
+backend/public/build
+backend/public/mix-manifest.json
+dist/
+build/
