@@ -12,28 +12,32 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     # Login de usuario
-    public function login (Request $request){
-        $request ->validate([
-            'email'=> 'required|email',
-            'password' => 'required',
+    public function login(Request $request){
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        throw ValidationException::withMessages([
+            'email' => ['Las credenciales proporcionadas son incorrectas.'],
         ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
-        }
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response() ->json([
-            'user' => $user,
-            'token' => $token,
-            'message' => 'Login exitoso'
-        ], 200);
     }
+
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    $user->load(['roles', 'permissions']);
+
+    return response()->json([
+        'user' => $user,
+        'token' => $token,
+        'permissions' => $user->getAllPermissions()->pluck('name'),
+        'roles' => $user->getRoleNames(),
+        'message' => 'Login exitoso'
+    ], 200);
+}
 
     # Logout de usuario
     public function logout (Request $request){
@@ -46,11 +50,15 @@ class AuthController extends Controller
     }
 
     # Conseguir usuario autenticado
-    public function user(Request $request) {
-        return response()->json([
-            'user' => $request->user()
-        ], 200);
-    }
+    public function user(Request $request){
+    $user = $request->user()->load(['roles', 'permissions']);
+
+    return response()->json([
+        'user' => $user,
+        'permissions' => $user->getAllPermissions()->pluck('name'),
+        'roles' => $user->getRoleNames(),
+    ], 200);
+}
 
     # Registrar usuario
     public function register(Request $request){
